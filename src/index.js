@@ -10,8 +10,9 @@ exports.Link = require("./structures/Link.js");
 exports.Invites = require("./structures/Invite.js");
 exports.Roles = require("./structures/Role.js");
 exports.Events = require("./structures/Events.js");
-//exports.ContextMenu = require("./structures/ContextMenu.js");
-//exports.Util = require("./structures/Util.js");
+
+// Music Classec
+ecports.joinVoice = require('./voice/joinVoice.js');
 
 // Function
 exports.encryption = require("./function/encryption.js");
