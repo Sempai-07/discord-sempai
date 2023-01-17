@@ -178,12 +178,18 @@ class Bot extends Client {
       });
     }
     
-    get prefixes() {
-        if (typeof this.prefix === "string") {
-            return [this.prefix];        } else if (Array.isArray(this.prefix)) {
-            return this.prefix;        } else {
-            const prefixes = this.prefix.prefixes ? [...this.prefix.prefixes] : [];
-            return prefixes;        }
+    loaderEevent(dir) {
+      const eventsPath = path.join(path.join(process.cwd(), dir));
+      const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+      for (const file of eventFiles) {
+        const filePath = path.join(eventsPath, file);
+        const event = require(filePath);
+        if (event.once) {
+          this.once(event.name, (...args) => event.execute(...args));
+        } else {
+          this.on(event.name, (...args) => event.code(...args));
+        }
+      }
     }
     
     connect() {
