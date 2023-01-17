@@ -26,7 +26,6 @@ npm i axios@1.2.2
 - `Invites`
 ##### Ещё не доработанные:
 - `ContextMenu`
-- `Music`
 
 #### Bot, MessageEmbed
 ```js
@@ -37,6 +36,14 @@ const bot = new Bot({
   prefix: "!", // ["?", "!"] пока что не сделано
   status: "idle" // idle, dnd, invisible, online
 });
+
+bot.createEvent({
+  name: 'ready',
+  once: false,
+  code: async(client) => {
+    console.log('Bot starting')
+  }
+})
 
 bot.command({
     name: "ping",
@@ -298,7 +305,6 @@ bot.loaderTextCmd("./cmd/")
 ```js
 const { ActionComponent } = require('discord-sempai');
 module.exports = {
-  cmd: {
     name: "select",
     code: (client, message, args) => {
     const select = new ActionComponent()
@@ -316,7 +322,6 @@ module.exports = {
           )
           message.reply({content: "Select menu", components: [select]})
     }
-  }
 }
 ```
 
@@ -330,7 +335,6 @@ bot.loaderComponent("./component/")
 ```js
 const { MessageEmbed } = require('discord-sempai');
 module.exports = {
-  component: {
     id: 'select_test',
     type: 'select', // button/select/modal
     code: (client, interaction) => {
@@ -341,7 +345,6 @@ module.exports = {
   .setTimestamp();
   
   return interaction.reply({embeds: [info]});
-  }
   }
 };
 ```
@@ -358,7 +361,6 @@ bot.loaderSlashCmd("./slash/")
 ```js
 const { MessageEmbed } = require('discord-sempai');
 module.exports = {
-  slash: {
     name: "command",
     description: "Привет мир!",
     code(client, interaction) {
@@ -370,11 +372,27 @@ module.exports = {
       .setFooter({text: "Test"});
       return interaction.reply({embeds: [test]});
     }
-  }
 };
 ```
 <image src="https://cdn.discordapp.com/attachments/806436124956426255/1061656249009197158/IMG_20230108_164242.jpg">
 
+#### loaderEvent
+Вставляем в главный файл
+```js
+bot.loaderEvent("./events/")
+// Путь к файлам
+```
+Создаём файл, без разницы как вы его назовёте, пример:
+```js
+const client = require("..")
+module.exports = {
+  name: 'messageCreate',
+  once: false,
+  code: async(message) => {
+    message.reply(`У ${client.user.tag  + client.ws.ping}  пинга`)
+  }
+}
+```
 
 <a href="https://discord.gg/j8G7jhHMbs">Официальный сервер поддержки</a>
 
