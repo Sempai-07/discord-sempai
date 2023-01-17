@@ -1,4 +1,4 @@
-// Classec
+// Default Classec
 exports.Bot = require("./structures/Bot.js");
 exports.Database = require("./structures/Database.js");
 exports.MessageEmbed = require("./structures/MessageEmbed.js");
@@ -9,10 +9,11 @@ exports.MessageAttachment = require("./structures/MessageAttachment.js");
 exports.Link = require("./structures/Link.js");
 exports.Invites = require("./structures/Invite.js");
 exports.Roles = require("./structures/Role.js");
-exports.Events = require("./structures/Events.js");
 
-// Music Classec
-ecports.joinVoice = require('./voice/joinVoice.js');
+// Voice Classec
+exports.joinVoice = require('./voice/joinVoice.js');
+ecports.leaveVoice = require('./voice/leaveVoice.js');
+ecports.memberVoice = require('./voice/memberVoice.js');
 
 // Function
 exports.encryption = require("./function/encryption.js");
