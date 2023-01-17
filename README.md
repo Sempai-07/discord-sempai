@@ -26,7 +26,7 @@ npm i axios@1.2.2
 - `Invites`
 ##### Ещё не доработанные:
 - `ContextMenu`
-- `Music
+- `Music`
 
 #### Bot, MessageEmbed
 ```js
