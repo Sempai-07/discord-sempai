@@ -11,6 +11,7 @@ class Bot extends Client {
     this.prefix = options.prefix,
     this.intents = options.intents || 131071,
     this.status = options.status || undefined,
+    this.help = options.help || true,
     this.commands = new Collection(),
     this.aliases = new Collection(),
     this.slashCommands = new Collection(),
@@ -19,15 +20,14 @@ class Bot extends Client {
     this.modals = new Collection();
  
     this.on('messageCreate', async (message) => {
-//      const prefixed = this.prefixed();
-      const prefix = this.prefix
+      const prefix = this.prefix;
       if(message.author.bot) return;
       if(message.channel.type !== 0) return;
       if(!message.content.startsWith(prefix)) return; 
       const args = message.content.slice(prefix.length).trim().split(/ +/g); 
-//      console.log(args);
       const cmd = args.shift().toLowerCase();
-      if(cmd.length == 0 ) return;
+      if(cmd.length == 0) return;
+      let client = this;
       let command = client.commands.get(cmd);
       if(!command) command = client.commands.get(client.aliases.get(cmd));
 				command.code(client, message, args);
@@ -138,19 +138,33 @@ class Bot extends Client {
       this.slashCommands.set(options.name, options);
     }
     
+    createEvent(dir) {
+      const eventsPath = path.join(path.join(process.cwd(), dir));
+      const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+      for (const file of eventFiles) {
+        const filePath = path.join(eventsPath, file);
+        const event = require(filePath);
+        if (event.once) {
+          this.once(event.name, (...args) => event.execute(...args));
+        } else {
+          this.on(event.name, (...args) => event.code(...args));
+        }
+      }
+    }
+    
     loaderComponent(dir) {
       if (!dir) return console.log(new TypeError("Invalid loaderComponent directory"));
       const components = fs.readdirSync(path.join(process.cwd(),dir));
       components.forEach(async(component) => {
         const pull = await require(path.join(process.cwd(),`${dir}${component}`));
-      if (pull.component.type === 'select') {
-        this.selects.set(pull.component.id, pull.component);
-      } else if (pull.component.type === 'button') {
-        this.buttons.set(pull.component.id, pull.component);
-        console.log(chalk.pink('Кнопка: ' + pull.component.id + ', успешно загружена'));
-      } else if (pull.component.type === 'modal') {
-       this.modals.set(pull.component.id, pull.component);
-       console.log(chalk.red('Модальное окно: ' + pull.component.id + ', успешно загружено'));
+      if (pull.type === 'select') {
+        this.selects.set(pull.id, pull);
+      } else if (pull.type === 'button') {
+        this.buttons.set(pull.id, pull);
+        console.log(chalk.pink('Кнопка: ' + pull.id + ', успешно загружена'));
+      } else if (pull.type === 'modal') {
+       this.modals.set(pull.id, pull);
+       console.log(chalk.red('Модальное окно: ' + pull.id + ', успешно загружено'));
       } else {
         console.log(new TypeError("interactionCreate type invalid"));
       }
@@ -162,9 +176,9 @@ class Bot extends Client {
       const commands = fs.readdirSync(path.join(process.cwd(),dir));
       commands.forEach(async(cmd) => {
         const pull = await require(path.join(process.cwd(),`${dir}${cmd}`));
-        console.log(chalk.blue(`Текстовая команда: ${pull.cmd.name}, успешно загружена`));
-        this.commands.set(pull.cmd.name, pull.cmd);
-        if(pull.cmd.aliases && Array.isArray(pull.cmd.aliases)) pull.cmd.aliases.forEach(alias => this.aliases.set(alias, pull.cmd.name));
+        console.log(chalk.blue(`Текстовая команда: ${pull.name}, успешно загружена`));
+        this.commands.set(pull.name, pull);
+        if(pull.aliases && Array.isArray(pull.aliases)) pull.aliases.forEach(alias => this.aliases.set(alias, pull.name));
       });
     }
     
@@ -173,19 +187,19 @@ class Bot extends Client {
       const slashCommands = fs.readdirSync(path.join(process.cwd(), dir));
       slashCommands.forEach(async(slash) => {
         const pull = await require(path.join(process.cwd(),`${dir}${slash}`));
-        this.slashCommands.set(pull.slash.name, pull.slash);
-        console.log(chalk.blue('Слэш команда: ' + pull.slash.name + ' успешно зарегистрирована'));
+        this.slashCommands.set(pull.name, pull);
+        console.log(chalk.blue('Слэш команда: ' + pull.name + ' успешно зарегистрирована'));
       });
     }
     
-    loaderEevent(dir) {
+    loaderEvent(dir) {
       const eventsPath = path.join(path.join(process.cwd(), dir));
       const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
       for (const file of eventFiles) {
         const filePath = path.join(eventsPath, file);
         const event = require(filePath);
         if (event.once) {
-          this.once(event.name, (...args) => event.execute(...args));
+          this.once(event.name, (...args) => event.code(...args));
         } else {
           this.on(event.name, (...args) => event.code(...args));
         }
