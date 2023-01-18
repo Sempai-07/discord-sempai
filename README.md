@@ -34,7 +34,7 @@ const { Bot, MessageEmbed } = require('discord-sempai');
 const bot = new Bot({
   token: "",
   prefix: "!", // ["?", "!"] пока что не сделано
-  status: "idle" // idle, dnd, invisible, online
+  help: true // Кастом хелп 
 });
 
 bot.createEvent({
@@ -70,6 +70,10 @@ bot.slashCommand({
   
   return interaction.reply({embeds: [ping]})
   }
+})
+
+bot.Status({
+  status: "dnd" // idle, dnd, invisible, online
 })
 
 bot.connect()
