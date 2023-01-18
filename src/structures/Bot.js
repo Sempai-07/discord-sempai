@@ -9,7 +9,7 @@ class Bot extends Client {
     super({intents: 131071});
     this.token = options.token,
     this.prefix = options.prefix,
-    this.intents = options.intents || 131071,
+//    this.intents = options.intents || 131071,
     this.status = options.status || undefined,
     this.help = options.help || true,
     this.commands = new Collection(),
@@ -30,6 +30,7 @@ class Bot extends Client {
       let client = this;
       let command = client.commands.get(cmd);
       if(!command) command = client.commands.get(client.aliases.get(cmd));
+      if(!command) return;
 				command.code(client, message, args);
     });
     
@@ -39,7 +40,6 @@ class Bot extends Client {
       const select = client.selects.get(interaction.values.join(', '));
       if (!select) return;
       try {
-//        console.log(select)
         await select.code(client, interaction);
       } catch (error) {
         console.log(error);
@@ -85,12 +85,10 @@ class Bot extends Client {
       
       this.on('interactionCreate', async(interaction) => {
         if (!interaction.isMessageContextMenuCommand()) return;
-        console.log('1')
         await interaction.deferReply({
            ephemeral: false
         });
         const command = this.slashCommands.get(interaction.commandName);
-        console.log(command)
         if (!command) return;
         let client = this;
         try {
@@ -99,18 +97,15 @@ class Bot extends Client {
           console.log(err);
         }
       });
-
+      
       this.on('ready', async() => {
-       let ClientStatus = this.status;
-        if (ClientStatus === undefined) return;
-        if (ClientStatus === "idle" || ClientStatus === "dnd" || ClientStatus === "online" || ClientStatus === "invisible") {
-          this.user.setPresence;
+        if(!this.status) return;
+        if (this.status === "idle" || this.status === "dnd" || this.status === "online" || this.status === "invisible") {
           this.user.setPresence({
-            status: ClientStatus
+            status: this.status
           });
         } else {
-          console.log(new TypeError("Invalid status name: " + ClientStatus));
-          process.exit();
+          return console.log(new TypeError('Invalid status'));
         }
       });
   }
@@ -206,8 +201,36 @@ class Bot extends Client {
       }
     }
     
+    Status(options = {name: "online", activity: undefined}) {
+      let ClientStatus = options.status;
+      let ClientActivity;
+      if (options.activity === 0) ClientActivity = ActivityType.Watching
+      else if (options.activity === 1) ClientActivity = ActivityType.Listening
+      else if (options.activity === 2) ClientActivity = ActivityType.Competing
+      else ClientActivity = undefined
+      if (ClientActivity === undefined) {
+        this.status = ClientStatus;
+      } else {
+        this.status = ClientStatus,
+        this.activity = ClientActivity;
+      }
+    }
+    
     connect() {
     this.login(this.token);
+    if (this.help) {
+      this.command({
+        name: 'help',
+        code: async(client, message, args) => {
+          let TextCmds = message.client.commands.filter(c => c.name);
+          let SlashCmds = message.client.slashCommands.filter(c => c.name);
+          // ––––––––––––––––––– //
+          let text_cmd = TextCmds.map(c => c.name).join("\n");
+          let slash_cmd = SlashCmds.map(c => c.name).join("\n");
+          message.reply("\`\`\`js\nText cmd\n" + text_cmd +'\n\nSlash cmd\n'+ slash_cmd +"\n\`\`\`");
+        }
+      });
+    }
     setTimeout(async() => {
       console.log(chalk.green(`Discord-sempai: версия 0.0.9\nБот под названием ${this.user.tag} запущен\nОфициальный сервер поддержки: https://discord.gg/j8G7jhHMbs`));
           if(this.slashCommands.size != 0) {
