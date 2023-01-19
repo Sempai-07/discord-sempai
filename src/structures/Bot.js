@@ -23,7 +23,15 @@ class Bot extends Client {
     this.modals = new Collection();
  
     this.on('messageCreate', async (message) => {
-      const prefix = this.prefix;
+      this.prefix = typeof this.prefix === "string" ? [this.prefix] : this.prefix;
+      let prefixes = [];
+      for (const prefix of this.prefix) {
+        prefixes.push(prefix);
+      }
+      const prefix = prefixes
+      .find((prefix) =>
+      message.content.toLowerCase().startsWith(prefix.toLowerCase())
+     );
       if(message.author.bot) return;
       if(message.channel.type !== 0) return;
       if(!message.content.startsWith(prefix)) return; 
@@ -148,7 +156,7 @@ class Bot extends Client {
         const filePath = path.join(eventsPath, file);
         const event = require(filePath);
         if (event.once) {
-          this.once(event.name, (...args) => event.execute(...args));
+          this.once(event.name, (...args) => event.code(...args));
         } else {
           this.on(event.name, (...args) => event.code(...args));
         }
