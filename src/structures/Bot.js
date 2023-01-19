@@ -1,4 +1,5 @@
 const { Client, Collection, ActivityType, PermissionsBitField, ApplicationCommandType, EmbedBuilder} = require('discord.js');
+const AsciiTable = require('ascii-table');
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
@@ -11,7 +12,9 @@ class Bot extends Client {
     this.prefix = options.prefix,
 //    this.intents = options.intents || 131071,
     this.status = options.status || undefined,
+    this.activity,
     this.help = options.help || true,
+    this.ready = options.ready || true,
     this.commands = new Collection(),
     this.aliases = new Collection(),
     this.slashCommands = new Collection(),
@@ -99,13 +102,18 @@ class Bot extends Client {
       });
       
       this.on('ready', async() => {
-        if(!this.status) return;
-        if (this.status === "idle" || this.status === "dnd" || this.status === "online" || this.status === "invisible") {
+        if (this.ready) {
+        console.log(chalk.green(`Discord-sempai: версия 0.0.10\nБот под названием ${this.user.tag} запущен\nОфициальный сервер поддержки: https://discord.gg/j8G7jhHMbs`));
+        }
+        if (!this.activity) {
           this.user.setPresence({
             status: this.status
           });
         } else {
-          return console.log(new TypeError('Invalid status'));
+          this.user.setPresence({
+            activities: [this.activity],
+            status: this.status
+          });
         }
       });
   }
@@ -147,73 +155,80 @@ class Bot extends Client {
       }
     }
     
-    loaderComponent(dir) {
+    async loaderComponent(dir) {
       if (!dir) return console.log(new TypeError("Invalid loaderComponent directory"));
-      const components = fs.readdirSync(path.join(process.cwd(),dir));
+      if (!id) return console.log(new TypeError("Invalid Id component"));
+      const Select = new AsciiTable().setHeading('Select', 'Status').setBorder('|', '=', "0", "0");
+      const Button = new AsciiTable().setHeading('Button', 'Status').setBorder('|', '=', "0", "0");
+      const Modal = new AsciiTable().setHeading('Modal', 'Status').setBorder('|', '=', "0", "0");
+      const components = await fs.readdirSync(path.join(process.cwd(),dir)).filter(file => file.endsWith('.js'));
       components.forEach(async(component) => {
-        const pull = await require(path.join(process.cwd(),`${dir}${component}`));
+        const pull = require(path.join(process.cwd(),`${dir}${component}`));
       if (pull.type === 'select') {
         this.selects.set(pull.id, pull);
+        await Select.addRow(pull.id, '✔️');
       } else if (pull.type === 'button') {
         this.buttons.set(pull.id, pull);
-        console.log(chalk.pink('Кнопка: ' + pull.id + ', успешно загружена'));
+        await Button.addRow(pull.id, '✔️');
       } else if (pull.type === 'modal') {
        this.modals.set(pull.id, pull);
-       console.log(chalk.red('Модальное окно: ' + pull.id + ', успешно загружено'));
+       await Modal.addRow(pull.id, '✔️');
       } else {
         console.log(new TypeError("interactionCreate type invalid"));
       }
       });
+      await console.log(chalk.blue(Select.toString()));
+      await console.log(chalk.blue(Button.toString()));
+      await console.log(chalk.blue(Modal.toString()));
     }
     
-    loaderTextCmd(dir) {
+    async loaderTextCmd(dir) {
       if (!dir) return console.log(new TypeError("Invalid loaderTextCmd directory"));
-      const commands = fs.readdirSync(path.join(process.cwd(),dir));
+      const loaderTextCmd = new AsciiTable().setHeading('Text cmd', 'Status').setBorder('|', '=', "0", "0");
+      const commands = await fs.readdirSync(path.join(process.cwd(),dir)).filter(file => file.endsWith('.js'));
       commands.forEach(async(cmd) => {
-        const pull = await require(path.join(process.cwd(),`${dir}${cmd}`));
-        console.log(chalk.blue(`Текстовая команда: ${pull.name}, успешно загружена`));
+        const pull = require(path.join(process.cwd(),`${dir}${cmd}`));
         this.commands.set(pull.name, pull);
+        await loaderTextCmd.addRow(pull.name, '✔️');
         if(pull.aliases && Array.isArray(pull.aliases)) pull.aliases.forEach(alias => this.aliases.set(alias, pull.name));
       });
+      await console.log(chalk.blue(loaderTextCmd.toString()));
     }
     
-    loaderSlashCmd(dir) {
+    async loaderSlashCmd(dir) {
       if (!dir) return console.log(new TypeError("Invalid loaderSlashCmd directory"));
-      const slashCommands = fs.readdirSync(path.join(process.cwd(), dir));
+      const loaderSlashCmd = new AsciiTable().setHeading('Slash cmd', 'Status').setBorder('|', '=', "0", "0");
+      const slashCommands = await fs.readdirSync(path.join(process.cwd(), dir)).filter(file => file.endsWith('.js'));
       slashCommands.forEach(async(slash) => {
-        const pull = await require(path.join(process.cwd(),`${dir}${slash}`));
+        const pull = require(path.join(process.cwd(),`${dir}${slash}`));
         this.slashCommands.set(pull.name, pull);
-        console.log(chalk.blue('Слэш команда: ' + pull.name + ' успешно зарегистрирована'));
+        await loaderSlashCmd.addRow(pull.name, '✔️');
       });
+      await console.log(chalk.blue(loaderSlashCmd.toString()));
     }
     
-    loaderEvent(dir) {
-      const eventsPath = path.join(path.join(process.cwd(), dir));
-      const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+  async loaderEvent(dir) {
+      const loaderEvent = new AsciiTable().setHeading('Events', 'Status').setBorder('|', '=', "0", "0");
+      const eventsPath = await path.join(path.join(process.cwd(), dir));
+      const eventFiles = await fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
       for (const file of eventFiles) {
         const filePath = path.join(eventsPath, file);
         const event = require(filePath);
+       await loaderEvent.addRow(event.name, '✔️');
         if (event.once) {
           this.once(event.name, (...args) => event.code(...args));
         } else {
           this.on(event.name, (...args) => event.code(...args));
         }
       }
+      await console.log(chalk.blue(loaderEvent.toString()));
     }
     
     Status(options = {name: "online", activity: undefined}) {
       let ClientStatus = options.status;
-      let ClientActivity;
-      if (options.activity === 0) ClientActivity = ActivityType.Watching
-      else if (options.activity === 1) ClientActivity = ActivityType.Listening
-      else if (options.activity === 2) ClientActivity = ActivityType.Competing
-      else ClientActivity = undefined
-      if (ClientActivity === undefined) {
-        this.status = ClientStatus;
-      } else {
+      let ClientActivity = options.activity;
         this.status = ClientStatus,
         this.activity = ClientActivity;
-      }
     }
     
     connect() {
@@ -222,22 +237,21 @@ class Bot extends Client {
       this.command({
         name: 'help',
         code: async(client, message, args) => {
-          let TextCmds = message.client.commands.filter(c => c.name);
-          let SlashCmds = message.client.slashCommands.filter(c => c.name);
+          let TextCmds = await message.client.commands.filter(c => c.name);
+          let SlashCmds = await message.client.slashCommands.filter(c => c.name);
           // ––––––––––––––––––– //
-          let text_cmd = TextCmds.map(c => c.name).join("\n");
-          let slash_cmd = SlashCmds.map(c => c.name).join("\n");
-          message.reply("\`\`\`js\nText cmd\n" + text_cmd +'\n\nSlash cmd\n'+ slash_cmd +"\n\`\`\`");
+          let text_cmd = await TextCmds.map(c => c.name).join("\n");
+          let slash_cmd = await SlashCmds.map(c => c.name).join("\n");
+          message.reply("Text cmd\n" + text_cmd +'\n\nSlash cmd\n'+ slash_cmd);
         }
       });
     }
     setTimeout(async() => {
-      console.log(chalk.green(`Discord-sempai: версия 0.0.9\nБот под названием ${this.user.tag} запущен\nОфициальный сервер поддержки: https://discord.gg/j8G7jhHMbs`));
-          if(this.slashCommands.size != 0) {
-            await this.application.commands.set(this.slashCommands);
-            console.log(chalk.yellow("Слэшы зарегистрированные"));
-          }
-        }, 8000);
+      if(this.slashCommands.size != 0) {
+        await this.application.commands.set(this.slashCommands);
+        console.log(chalk.yellow("Слэшы зарегистрированные"));
+      }
+    }, 8000);
   }
 }
 
