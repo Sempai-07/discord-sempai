@@ -10,6 +10,7 @@
 npm i discord-sempai@0.0.10@beta
 npm i discord.js@14.7.1
 npm i database-sempai@2.0.4
+npm i ascii-table@0.0.9
 npm i axios@1.2.2
 ```
 
@@ -34,7 +35,8 @@ const { Bot, MessageEmbed } = require('discord-sempai');
 const bot = new Bot({
   token: "",
   prefix: "!", // ["?", "!"] пока что не сделано
-  help: true // Кастом хелп 
+  help: true, // Кастом хелп 
+  ready: true // Встроенное сообщение о запуске бота
 });
 
 bot.createEvent({
@@ -73,7 +75,11 @@ bot.slashCommand({
 })
 
 bot.Status({
-  status: "dnd" // idle, dnd, invisible, online
+  status: "dnd", // idle, dnd, invisible, online
+  activity: {
+    type: 3,
+    name: "Это ты, а не я!"
+  }
 })
 
 bot.connect()
