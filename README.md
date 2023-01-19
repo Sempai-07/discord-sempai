@@ -7,7 +7,7 @@
 
 #### Установка
 ```js
-npm i discord-sempai@0.0.10@beta
+npm i discord-sempai@0.0.10
 npm i discord.js@14.7.1
 npm i database-sempai@2.0.4
 npm i ascii-table@0.0.9
@@ -34,7 +34,7 @@ const { Bot, MessageEmbed } = require('discord-sempai');
 
 const bot = new Bot({
   token: "",
-  prefix: "!", // ["?", "!"] пока что не сделано
+  prefix: ["?", "!", "@"] // или просто "!!"
   help: true, // Кастом хелп 
   ready: true // Встроенное сообщение о запуске бота
 });

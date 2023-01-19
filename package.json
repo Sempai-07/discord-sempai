@@ -3,7 +3,6 @@
   "version": "0.0.10",
   "description": "Simplified package for creating bots in discord",
   "main": "src/index.js",
-  "types": "src/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
