@@ -1,5 +1,15 @@
 const { Client, Message, Collection } = require('discord.js');
 
+Message.prototype.roleMemberSize = function(roleid) {
+  const message = this;
+  const role = message.guild.roles.cache.get(roleid);
+  try {
+    return role.members.size;
+  } catch (e) {
+    return undefined;
+  }
+};
+
 Message.prototype.emojis = function(separator) {
   const message = this;
   let emoji = message.guild.emojis.cache.map((e) => e = message).join(separator) || undefined; // пусть будет ☠️

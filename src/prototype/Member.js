@@ -1,4 +1,4 @@
-const { GuildMember, Guild} = require('discord.js');
+const { GuildMember, Guild } = require('discord.js');
 
 Object.defineProperty(GuildMember.prototype, "perms", {
     get: function perms() {
