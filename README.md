@@ -97,13 +97,19 @@ bot.command({
           .addSelectMenu({
             customId: "select",
             placeholder: "Ничего не выбрано",
-           //.setMinValues(1),
-           //.setMaxValues(1),
-            options: {
+           minValues: 2,
+            maxValues: 2,
+            options: [{
               label: 'Информация',
               description: 'В этом разделе вы узнаете о пакете',
-              value: 'select_test'
-            }
+              value: 'select_info',
+              emoji: '🤓'
+            }, {
+              label: 'Модерация',
+              description: 'Охранна сервера',
+              value: 'select_moder',
+              emoji: '🛡️'
+            }]
           }
           )
           message.reply({content: "Select menu", components: [select]})
@@ -111,7 +117,7 @@ bot.command({
 })
 
 bot.interactionCreate({
-  id: 'select_test',
+  id: 'select_info',
   type: 'select', // button/select
   code: (client, interaction) => {
   const select = new MessageEmbed()
