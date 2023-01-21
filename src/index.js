@@ -13,7 +13,6 @@ exports.Roles = require("./structures/Role.js");
 // Voice function / classes
 exports.joinVoice = require('./voice/joinVoice.js');
 exports.leaveVoice = require('./voice/leaveVoice.js');
-exports.memberVoice = require('./voice/memberVoice.js');
 
 // Function
 exports.encryption = require("./function/encryption.js");
