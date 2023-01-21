@@ -97,7 +97,7 @@ bot.command({
           .addSelectMenu({
             customId: "select",
             placeholder: "Ничего не выбрано",
-           minValues: 2,
+            minValues: 2,
             maxValues: 2,
             options: [{
               label: 'Информация',
@@ -248,22 +248,21 @@ connect()
 ### Link
 ```js
 const { Link } = require('discord-sempai');
-const link = new Link()
 
-link.validLink(url)
+Link.validLink(url)
 // Проверит сыллку на валидность, вернёт true/false
 
-link.validImage(url)
+Link.validImage(url)
 // Проверит сыллку эмодзи на валидность, вернёт true/false
 
-link.request(url)
+Link.request(url)
 // Сложно объяснить, эта функция используется чтобы получить данные в json формате, можно использовать чтобы получить апи картинку
 
 // Пример
 bot.command({
   name: 'request',
   code: async (client, message, args) => {
-    let text = await link.request('https://some-random-api.ml/animal/dog');
+    let text = await Link.request('https://some-random-api.ml/animal/dog');
     let image = new MessageEmbed()
     .setImage(text['image'])
    message.reply({embeds: [image]});
@@ -274,10 +273,8 @@ bot.command({
 ### Invites
 ```js
 const { Invites } = require('discord-sempai');
-const invite = new Invites()
-// lala
 
-const info = await getInviteInfo(client, 'invite code/link', 'options')
+const info = await Invites.getInviteInfo(client, 'invite code/link', 'options')
 
 // options: channelname, channelid, channelmention, guildname, guildid, guildmention, invitername, inviterdiscm, invitertag, inviterid, invitermention
 
@@ -287,9 +284,8 @@ const info = await getInviteInfo(client, 'invite code/link', 'options')
 ### Roles
 ```js
 const { Roles } = require('discord-sempai');
-const role = new Roles()
 
-role.getRoleInfo('guildid', 'roleid', 'options')
+Roles.getRoleInfo('guildid', 'roleid', 'options')
 // options: hexColor, members, memberCount, managed, position, permissions, tagsbotid, tagsapplicationid, tagspremiumSubscriberRole
 
 // Всё должно быть асинхронным
