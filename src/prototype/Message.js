@@ -12,7 +12,7 @@ Message.prototype.roleMemberSize = function(roleid) {
 
 Message.prototype.emojis = function(separator) {
   const message = this;
-  let emoji = message.guild.emojis.cache.map((e) => e = message).join(separator) || undefined; // пусть будет ☠️
+  let emoji = message.guild.emojis.cache.map(e => undefined).join(separator);
   return emoji;
 };
 
@@ -51,7 +51,7 @@ Message.prototype.findUser = function(client, user, returnAuthor = true) {
       (m) =>
         m.username.toLowerCase() === user.toLowerCase() ||
         m.tag.toLowerCase() === user.toLowerCase()
-    ) || client.users.fetch(user).catch(e => u = message.author); // пусть будет ☠️
+    ) || client.users.fetch(user).catch(e => undefined);
     if (returnAuthor === true) return u.id === undefined ? message.author.id : u.id;
     else return u.id;
 };
@@ -66,7 +66,7 @@ Message.prototype.findMember = function(member, returnAuthor = true) {
         m.user.tag.toLowerCase() === member.toLowerCase() ||
         m.user.username.toLowerCase() === member.toLowerCase() ||
         m.displayName.toLowerCase() === member.toLowerCase()
-    ) || message.mentions.members.first() || message.guild.members.fetch(member).catch(e => u = message.member); // пусть будет ☠️
+    ) || message.mentions.members.first() || message.guild.members.fetch(member).catch(e => undefined);
     if (returnAuthor === true) return u.id === undefined ? message.member.id : u.id;
     else return u.id;
 };
