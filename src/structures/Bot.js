@@ -149,19 +149,15 @@ class Bot extends Client {
       this.slashCommands.set(options.name, options);
     }
     
-    createEvent(dir) {
-      const eventsPath = path.join(path.join(process.cwd(), dir));
-      const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-      for (const file of eventFiles) {
-        const filePath = path.join(eventsPath, file);
-        const event = require(filePath);
-        if (event.once) {
+    createEvent(event) {
+       if (event.once) {
           this.once(event.name, (...args) => event.code(...args));
         } else {
           this.on(event.name, (...args) => event.code(...args));
+        } else {
+          return console.log(new TypeError('Invalid once options'));
         }
       }
-    }
     
     async loaderComponent(dir) {
       if (!dir) return console.log(new TypeError("Invalid loaderComponent directory"));
