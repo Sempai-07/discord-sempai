@@ -25,7 +25,7 @@ const EmbedParser = (msg) => {
     
     if (checkContent("url")) {
       if (!embed.title) return console.log(new TypeError("{title:} was not used"));
-      embed.url = rawr.split("{url:")[1].split("}")[0].trim();
+      embed.url = parserEmbed.split("{url:")[1].split("}")[0].trim();
     }
     
     if (checkContent("title")) {
