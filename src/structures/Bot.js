@@ -1,5 +1,6 @@
 const { Client, Collection, ActivityType, PermissionsBitField, ApplicationCommandType, EmbedBuilder} = require('discord.js');
 const AsciiTable = require('ascii-table');
+const ms = require('ms');
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
@@ -20,7 +21,9 @@ class Bot extends Client {
     this.slashCommands = new Collection(),
     this.selects = new Collection(),
     this.buttons = new Collection(),
-    this.modals = new Collection();
+    this.modals = new Collection(),
+    this.nonPrefixCmd = new Collection(),
+    this.nonPrefixAliases = new Collection();
  
     this.on('messageCreate', async (message) => {
       this.prefix = typeof this.prefix === "string" ? [this.prefix] : this.prefix;
@@ -42,7 +45,20 @@ class Bot extends Client {
       let command = client.commands.get(cmd);
       if(!command) command = client.commands.get(client.aliases.get(cmd));
       if(!command) return;
-				command.code(client, message, args);
+      command.code(client, message, args);
+    });
+    
+    this.on('messageCreate', async (message) => {
+      if(message.author.bot) return;
+      if(message.channel.type !== 0) return; 
+      const args = message.content.trim().split(/ +/g); 
+      const cmd = args.shift().toLowerCase();
+      if(cmd.length == 0) return;
+      let client = this;
+      let command = client.nonPrefixCmd.get(cmd);
+      if(!command) command = client.nonPrefixCmd.get(client.nonPrefixAliases.get(cmd));
+      if(!command) return;
+      command.code(client, message, args);
     });
     
     this.on('interactionCreate', async (interaction) => {
@@ -111,7 +127,7 @@ class Bot extends Client {
       
       this.on('ready', async() => {
         if (this.ready) {
-        console.log(chalk.green(`Discord-sempai: версия 0.0.10\nБот под названием ${this.user.tag} запущен\nОфициальный сервер поддержки: https://discord.gg/j8G7jhHMbs`));
+        console.log(chalk.green(`Discord-sempai: version 0.0.10\nBot called ${this.user.tag} запущен\nOfficial support server: https://discord.gg/j8G7jhHMbs`));
         }
         if (!this.activity) {
           this.user.setPresence({
@@ -126,9 +142,14 @@ class Bot extends Client {
       });
   }
   
-  command(options = CommandOptions) {
-      this.commands.set(options.name, options);
-      if(options.aliases && Array.isArray(options.aliases)) options.aliases.forEach(alias => this.aliases.set(alias, options.name));
+  command(options = {nonPrefix: false}) {
+      if (options.nonPrefix == true) {
+        this.commands.set(options.name, options);
+        if(options.aliases && Array.isArray(options.aliases)) options.aliases.forEach(alias => this.aliases.set(alias, options.name));
+      } else if (options.nonPrefix == false) {
+        this.nonPrefixCmd.set(options.name, options);
+        if(options.nonPrefixCmd && Array.isArray(options.nonPrefixCmd)) options.nonPrefixCmd.forEach(alias => this.nonPrefixAliases.set(alias, options.name));
+      }
     }
     
   interactionCreate(options = InteractionOption) {
@@ -149,11 +170,11 @@ class Bot extends Client {
       this.slashCommands.set(options.name, options);
     }
     
-    createEvent(event) {
-       if (event.once) {
-          this.once(event.name, (...args) => event.code(...args));
-        } else {
-          this.on(event.name, (...args) => event.code(...args));
+    createEvent(options) {
+      if (options.once) {
+        this.once(options.name, (...args) => options.code(...args));
+      } else if (options === false) {
+        this.on(options.name, (...args) => options.code(...args));
         } else {
           return console.log(new TypeError('Invalid once options'));
         }
@@ -231,8 +252,8 @@ class Bot extends Client {
     Status(options = {name: "online", activity: undefined}) {
       let ClientStatus = options.status;
       let ClientActivity = options.activity;
-        this.status = ClientStatus,
-        this.activity = ClientActivity;
+      this.status = ClientStatus,
+      this.activity = ClientActivity;
     }
     
     connect() {
@@ -260,3 +281,5 @@ class Bot extends Client {
 }
 
 module.exports = Bot;
+
+// © 2022 @Sempai Development

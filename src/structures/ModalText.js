@@ -3,14 +3,13 @@ const { TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.
 class ModalText extends TextInputBuilder {
   constructor(textModal = ModalTextOptions) {
     super();
-    if (!textModal.id) return console.log(new TypeError("Invalid ModalText id"));
+    if (!textModal.customId) return console.log(new TypeError("Invalid ModalText customId"));
     if (!textModal.label) return console.log(new TypeError("Invalid ModalText label"));
-//    if (!textModal.placeholder) return console.log(new TypeError("Invalid ModalText placeholder"));
-    this.setCustomId(textModal.id);
+    this.setCustomId(textModal.customId);
     this.setLabel(textModal.label);
-    this.setStyle(TextInputStyle.Paragraph);
-    this.setMaxLength(textModal.max || 4000);
-	  this.setMinLength(textModal.min || 0);
+    this.setStyle(textModal.style || TextInputStyle.Paragraph);
+    this.setMaxLength(textModal.maxValue || 4000);
+	  this.setMinLength(textModal.maxValue || 0);
 	  this.setPlaceholder(textModal.placeholder);
 	  this.setValue(textModal.value);
 	  this.setRequired(textModal.required || true);
@@ -20,3 +19,5 @@ class ModalText extends TextInputBuilder {
 }
 
 module.exports = ModalText;
+
+// © 2022 @Sempai Development

@@ -10,3 +10,5 @@ class MessageAttachment extends AttachmentBuilder {
 }
 
 module.exports = MessageAttachment;
+
+// © 2022 @Sempai Development

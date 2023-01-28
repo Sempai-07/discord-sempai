@@ -1,5 +1,4 @@
 const { ActionRowBuilder, ButtonBuilder, SelectMenuBuilder, StringSelectMenuBuilder} = require('discord.js');
-//const ButtonStyleOptions = require("./Options/options.js");
 
 class ActionComponent extends ActionRowBuilder{
   constructor() {
@@ -7,15 +6,16 @@ class ActionComponent extends ActionRowBuilder{
   }
   
   addButton(button = ButtonOptions) {
-    if (!button.id) return console.log(new TypeError("Invalid button id"));
+    if (!button.customId) return console.log(new TypeError("Invalid button id"));
     if (!button.label) return console.log(new TypeError("Invalid button label"));
     if (!button.style) return console.log(new TypeError("Invalid button style"));
     this.addComponents(
       new ButtonBuilder()
-      .setCustomId(button.id)
+      .setCustomId(button.customId)
       .setLabel(button.label)
       .setStyle(button.style)
       .setDisabled(button.disabled || false)
+      .setEmoji(button.emoji || undefined)
       );
       return this;
   }
@@ -28,8 +28,8 @@ class ActionComponent extends ActionRowBuilder{
 				new StringSelectMenuBuilder()
 					.setCustomId(menu.customId)
 					.setPlaceholder(menu.placeholder)
-					.setMinValues(menu.minValues || 1)
-					.setMaxValues(menu.maxValues || 1)
+					.setMinValues(menu.minValue || 1)
+					.setMaxValues(menu.maxValue || 1)
 					.addOptions(menu.options)
 					);
 					return this;
@@ -37,3 +37,5 @@ class ActionComponent extends ActionRowBuilder{
 }
 
 module.exports = ActionComponent;
+
+// © 2022 @Sempai Development

@@ -11,3 +11,5 @@ class Database extends CreateSql {
 }
 
 module.exports = Database;
+
+// © 2022 @Sempai Development

@@ -8,7 +8,7 @@ class MessageEmbed extends EmbedBuilder {
       if(embed.description) this.setDescription(embed.description);
       if(embed.color) this.setColor(embed.color);
       if(embed.url) this.setURL(embed.url);
-      if(embed.thumbnail) this.setThumbnail(embed.url);
+      if(embed.thumbnail) this.setThumbnail(embed.thumbnail);
       if(typeof(embed.author) == "object") {
         try {
           this.setAuthor(embed.author);
@@ -32,3 +32,5 @@ class MessageEmbed extends EmbedBuilder {
 }
 
 module.exports = MessageEmbed;
+
+// © 2022 @Sempai Development
