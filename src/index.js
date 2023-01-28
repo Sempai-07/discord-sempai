@@ -6,19 +6,13 @@ exports.ActionComponent = require("./structures/ActionComponent.js");
 exports.ModalText = require("./structures/ModalText.js");
 exports.Modal = require("./structures/Modal.js");
 exports.MessageAttachment = require("./structures/MessageAttachment.js");
-exports.Link = require("./structures/Link.js");
-exports.Invites = require("./structures/Invite.js");
-exports.Roles = require("./structures/Role.js");
+exports.Parser = require("./util/Parser.js");
+exports.Util = require("./util/Util.js");
 
-// Voice function / classes
+// Voice Function/Classec
 exports.joinVoice = require('./voice/joinVoice.js');
 exports.leaveVoice = require('./voice/leaveVoice.js');
 
 // Function
 exports.encryption = require("./function/encryption.js");
 exports.decoding = require("./function/decoding.js");
-
-// Prototype
-exports = require("./prototype/Message.js");
-exports = require("./prototype/Guild.js");
-exports = require("./prototype/Member.js");
