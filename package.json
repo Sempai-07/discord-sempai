@@ -1,6 +1,6 @@
 {
   "name": "discord-sempai",
-  "version": "0.0.10",
+  "version": "0.1.5",
   "description": "Simplified package for creating bots in discord",
   "main": "src/index.js",
   "scripts": {
@@ -12,6 +12,14 @@
     "chalk": "^2.4.2",
     "axios": "^1.2.2",
     "ascii-table": "^0.0.9"
+  },
+  "devDependencies": {
+    "discord-music-player": "^9.1.1",
+    "@discordjs/opus": "^0.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sempai-07/discord-sempai"
   },
   "author": "",
   "license": "ISC"
