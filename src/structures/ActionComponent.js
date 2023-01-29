@@ -6,7 +6,7 @@ class ActionComponent extends ActionRowBuilder{
   }
   
   addButton(button = ButtonOptions) {
-    if (!button.customId) return console.log(new TypeError("Invalid button id"));
+    if (!button.customId) return console.log(new TypeError("Invalid button customId"));
     if (!button.label) return console.log(new TypeError("Invalid button label"));
     if (!button.style) return console.log(new TypeError("Invalid button style"));
     this.addComponents(

@@ -21,9 +21,7 @@ class Bot extends Client {
     this.slashCommands = new Collection(),
     this.selects = new Collection(),
     this.buttons = new Collection(),
-    this.modals = new Collection(),
-    this.nonPrefixCmd = new Collection(),
-    this.nonPrefixAliases = new Collection();
+    this.modals = new Collection()
  
     this.on('messageCreate', async (message) => {
       this.prefix = typeof this.prefix === "string" ? [this.prefix] : this.prefix;
@@ -44,19 +42,6 @@ class Bot extends Client {
       let client = this;
       let command = client.commands.get(cmd);
       if(!command) command = client.commands.get(client.aliases.get(cmd));
-      if(!command) return;
-      command.code(client, message, args);
-    });
-    
-    this.on('messageCreate', async (message) => {
-      if(message.author.bot) return;
-      if(message.channel.type !== 0) return; 
-      const args = message.content.trim().split(/ +/g); 
-      const cmd = args.shift().toLowerCase();
-      if(cmd.length == 0) return;
-      let client = this;
-      let command = client.nonPrefixCmd.get(cmd);
-      if(!command) command = client.nonPrefixCmd.get(client.nonPrefixAliases.get(cmd));
       if(!command) return;
       command.code(client, message, args);
     });
@@ -87,7 +72,6 @@ class Bot extends Client {
     
     this.on("interactionCreate", async(interaction) => {
         if (!interaction.isCommand()) return;
-
         const command = this.slashCommands.get(interaction.commandName);
         if (!command) return;
         let client = this;
@@ -110,24 +94,9 @@ class Bot extends Client {
         }
       });
       
-      this.on('interactionCreate', async(interaction) => {
-        if (!interaction.isMessageContextMenuCommand()) return;
-        await interaction.deferReply({
-           ephemeral: false
-        });
-        const command = this.slashCommands.get(interaction.commandName);
-        if (!command) return;
-        let client = this;
-        try {
-          await command.code(client, interaction);
-        } catch (err) {
-          console.log(err);
-        }
-      });
-      
       this.on('ready', async() => {
         if (this.ready) {
-        console.log(chalk.green(`Discord-sempai: version 0.0.10\nBot called ${this.user.tag} запущен\nOfficial support server: https://discord.gg/j8G7jhHMbs`));
+        console.log(chalk.green(`Discord-sempai: version 0.1.5\nBot called ${this.user.tag} launched\nOfficial support server: https://discord.gg/j8G7jhHMbs`));
         }
         if (!this.activity) {
           this.user.setPresence({
@@ -142,17 +111,12 @@ class Bot extends Client {
       });
   }
   
-  command(options = {nonPrefix: false}) {
-      if (options.nonPrefix == true) {
+  command(options) {
         this.commands.set(options.name, options);
         if(options.aliases && Array.isArray(options.aliases)) options.aliases.forEach(alias => this.aliases.set(alias, options.name));
-      } else if (options.nonPrefix == false) {
-        this.nonPrefixCmd.set(options.name, options);
-        if(options.nonPrefixCmd && Array.isArray(options.nonPrefixCmd)) options.nonPrefixCmd.forEach(alias => this.nonPrefixAliases.set(alias, options.name));
-      }
     }
     
-  interactionCreate(options = InteractionOption) {
+  interactionCreate(options) {
       if (options.type === 'select') {
       this.selects.set(options.id, options);
       } else if (options.type === 'button') {
@@ -164,7 +128,7 @@ class Bot extends Client {
       }
     }
     
-    slashCommand(options = SlashCommandOptions) {
+    slashCommand(options) {
       if (!options.name) return console.log(new TypeError("Invalid slashCommands name"));
       if (!options.description) return console.log(new TypeError("Invalid slashCommands description"));
       this.slashCommands.set(options.name, options);
@@ -274,7 +238,7 @@ class Bot extends Client {
     setTimeout(async() => {
       if(this.slashCommands.size != 0) {
         await this.application.commands.set(this.slashCommands);
-        console.log(chalk.yellow("Слэшы зарегистрированные"));
+        console.log(chalk.yellow("Slashes registered"));
       }
     }, 8000);
   }
