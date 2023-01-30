@@ -180,13 +180,13 @@ bot.command({
 
 `{url:link}` - устанавливает гиперссылку для заголовка
 
-`{footer:text:url?}`` - нижней колонтитул
+`{footer:text:url?}` - нижней колонтитул
 
-`{description:text}`` - описание
+`{description:text}` - описание
 
 `{color:hex}` - устанавливает цвет эмбета
 
-`{timestamp:ms}`` - вставить отметку времени
+`{timestamp:ms}` - вставить отметку времени
 
 `{image:url}` - изображение
 
