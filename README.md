@@ -92,9 +92,9 @@ bot.music = new Music(bot, {
 
 bot.command({
   name: "play",
-  code: async(bot, message, args) => {
-    let queue = bot.music.createQueue(message.guild.id);
-      const info = await bot.music.playSong(queue, args.join(" "), message.member.voice.channel, message.author.tag, message.guild.id)
+  code: async(client, message, args) => {
+    let queue = client.music.createQueue(message.guild.id);
+      const info = await client.music.playSong(queue, args.join(" "), message.member.voice.channel, message.author.tag, message.guild.id)
       message.reply(`Добавил в очередь! \nНазвание: ${info.name}\nАвтор: ${info.author}\nДлина: ${info.duration}`)
   }
 })
