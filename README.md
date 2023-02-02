@@ -7,7 +7,7 @@
 
 #### Установка
 ```js
-npm i discord-sempai@0.1.5
+npm i discord-sempai@0.2.2
 npm i discord.js@14.7.1
 npm i database-sempai@2.0.4
 npm i ascii-table@0.0.9
@@ -23,7 +23,7 @@ const { Bot, MessageEmbed } = require('discord-sempai');
 
 const bot = new Bot({
   token: "",
-  prefix: ["?", "!", "@"] // или просто "!!"
+  prefix: ["?", "!", "@"], // или просто "!!"
   help: true, // Кастом хелп 
   ready: true // Встроенное сообщение о запуске бота
 });
@@ -172,7 +172,7 @@ bot.command({
 
 `{author:text:url?}` - автор вставки
 
-`{authorURL:url}` - устанавливает гиперссылку длч автора
+`{authorURL:url}` - устанавливает гиперссылку для автора
 
 `{title:text}` - заголовок
 
@@ -288,8 +288,8 @@ bot.slashCommand({
             label: "Tекст",
             placeholder: 'test',
             value: 'test',
-            max: 4000,
-            min: 0,
+            maxValue: 4000,
+            minValue: 0,
             required: true
         })
         modal.addComponents(text)
@@ -430,8 +430,8 @@ module.exports = {
           .addSelectMenu({
             customId: "select",
             placeholder: "Ничего не выбрано",
-          // minValues: 1,
-          // maxValues: 1,
+            minValue: 1,
+            maxValue: 1,
             options: {
               label: 'Информация',
               description: 'В этом разделе вы узнаете о себе',
