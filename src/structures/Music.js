@@ -7,25 +7,27 @@ try {
       return this;
     }
     
-    async playSong(queue, songName, requestedBy, guildId, voiceChannelId) {
-      await queue.join(voiceChannelId);
-      const guildQueue = this.getQueue(guildId);
-      const info = await queue.play(songName, {
-        requestedBy: requestedBy
-      }).catch(err => undefined);
-      const obj = {
-        name: info.name,
-        author: info.author,
-        url: info.url,
-        duration: info.duration,
-        live: info.isLive,
-        first: info.isFirst
-      };
-      return obj;
+    async playSong(options) {
+        await options.queue.join(options.voiceChannelId)
+        const guildQueue = this.getQueue(options.guildId)
+            const info = await options.queue.play(options.songName, {
+                requestedBy: options.requestedBy
+            }).catch(err => {
+                console.log(err)
+            });
+            const obj = {
+                name: info.name,
+                author: info.author,
+                url: info.url,
+                duration: info.duration,
+                live: info.isLive,
+                first: info.isFirst
+            }
+            return obj
     }
     
     queueSongs(guildId) {
-      const sngs = this.getQueue(guildID).song;
+      const sngs = this.getQueue(guildId).songs;
       let qu = [];
       sngs.forEach((sng) => {
         qu.push({author: sng.author, name: sng.name, duration: sng.duration, requestedBy: sng.requestedBy});
@@ -33,7 +35,7 @@ try {
       return qu;
     }
     
-    loopMusic(options) {
+    loopMusic(guildId, types) {
       let type = 0;
       if(types == 'OFF') type = 0;
       if(types == 'SONG') type = 1;
@@ -44,7 +46,7 @@ try {
     
     progressBar(guildId, arrow, block, size) {
       const queue = this.getQueue(guildId);
-      const pbr = new ProgressBar(queue, {size: options.size || 10, block: block || "-", arrow: arrow || ">"});
+      const pbr = new ProgressBar(queue, {size: size || 10, block: block || "-", arrow: arrow || ">"});
       return {bar: `${pbr.bar}`, time: `${pbr.times}`};
     }
     
