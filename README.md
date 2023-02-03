@@ -23,7 +23,7 @@ const { Bot, MessageEmbed } = require('discord-sempai');
 
 const bot = new Bot({
   token: "",
-  prefix: ["?", "!", "@"], // или просто "!!"
+  prefix: ["?", "!", "@"] // или просто "!!"
   help: true, // Кастом хелп 
   ready: true // Встроенное сообщение о запуске бота
 });
@@ -90,11 +90,35 @@ bot.music = new Music(bot, {
   leaveOnEmpty: false
 })
 
+bot.music.on('songAdd', (queue, song) => {
+  queue.data.queueInitMessage.channel.send(`**${song}** был добавлен в очередь.`);
+})
+
+bot.music.on('queueEnd', (queue) => {
+  queue.data.queueInitMessage.channel.send(`Очередь закончилась, играть не во что.`);
+})
+
+bot.music.on('queueDestroyed', (queue) => {
+  queue.data.queueInitMessage.channel.send(`Воспроизведение закончилось.`);
+})
+
 bot.command({
   name: "play",
   code: async(client, message, args) => {
-    let queue = client.music.createQueue(message.guild.id);
-      const info = await client.music.playSong(queue, args.join(" "), message.member.voice.channel, message.author.tag, message.guild.id)
+    let queue = client.music.createQueue(message.guild.id, {
+    data: {
+    queueInitMessage: message,
+    myObject: '...',
+    more: '...'
+    }
+    })
+      const info = await client.music.playSong({
+        queue: queue,
+        songName: args.join(" "),
+        voiceChannelId: message.member.voice.channel,
+        requestedBy: message.author.tag,
+        guildId: message.guild.id
+      })
       message.reply(`Добавил в очередь! \nНазвание: ${info.name}\nАвтор: ${info.author}\nДлина: ${info.duration}`)
   }
 })
@@ -102,7 +126,13 @@ bot.command({
 ##### Дополнительные функции
 
 ```js
-await music.playSong(queue, songName, requestedBy, guildId, voiceChannelId) 
+await music.playSong({
+        queue: queue,
+        songName: args.join(" "),
+        voiceChannelId: message.member.voice.channel,
+        requestedBy: message.author.tag,
+        guildId: message.guild.id
+      })
 // Добавляет песню в очередь
 
 music.queueSongs(guildId)
@@ -136,6 +166,9 @@ music.pauseQueue(guildId)
 music.resumeQueue(guildId) 
 // Возобновляет очередь
 ```
+
+<a href="https://discord-music-player.js.org/docs/main/master/class/Player">Дополнительная информация</a>
+
 
 #### Parser
 
@@ -171,25 +204,15 @@ bot.command({
 ```
 
 `{author:text:url?}` - автор вставки
-
-`{authorURL:url}` - устанавливает гиперссылку для автора
-
+`{authorURL:url}` - устанавливает гиперссылку длч автора
 `{title:text}` - заголовок
-
 `{thumbnail:url}` - URL миниатюры изображения для встраивания
-
 `{url:link}` - устанавливает гиперссылку для заголовка
-
-`{footer:text:url?}` - нижней колонтитул
-
-`{description:text}` - описание
-
+`{footer:text:url?}`` - нижней колонтитул
+`{description:text}`` - описание
 `{color:hex}` - устанавливает цвет эмбета
-
-`{timestamp:ms}` - вставить отметку времени
-
+`{timestamp:ms}`` - вставить отметку времени
 `{image:url}` - изображение
-
 Все эти параметры указввайте в `{newEmbed:...}`. Пока что в одном классе можно создать один эмбед.
 
 #### ActionComponent
@@ -288,8 +311,8 @@ bot.slashCommand({
             label: "Tекст",
             placeholder: 'test',
             value: 'test',
-            maxValue: 4000,
-            minValue: 0,
+            max: 4000,
+            min: 0,
             required: true
         })
         modal.addComponents(text)
@@ -430,8 +453,8 @@ module.exports = {
           .addSelectMenu({
             customId: "select",
             placeholder: "Ничего не выбрано",
-            minValue: 1,
-            maxValue: 1,
+          // minValues: 1,
+          // maxValues: 1,
             options: {
               label: 'Информация',
               description: 'В этом разделе вы узнаете о себе',
