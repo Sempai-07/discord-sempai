@@ -1,11 +1,11 @@
 const { CreateSql } = require('database-sempai');
 
 class Database extends CreateSql {
-  constructor(options) {
+  constructor(options = {}) {
     super({
-      path: this.path || "database",
-      table: this.table || ["main"],
-      key: this.key || "bot"
+      path: options.path || "database",
+      table: options.table || ["main"],
+      key: options.key || "bot"
     });
   }
 }
