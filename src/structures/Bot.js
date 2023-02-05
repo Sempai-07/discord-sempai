@@ -1,6 +1,5 @@
 const { Client, Collection, ActivityType, PermissionsBitField, ApplicationCommandType, EmbedBuilder} = require('discord.js');
 const AsciiTable = require('ascii-table');
-const ms = require('ms');
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
@@ -96,7 +95,7 @@ class Bot extends Client {
       
       this.on('ready', async() => {
         if (this.ready) {
-        console.log(chalk.green(`Discord-sempai: version 0.2.2\nBot called ${this.user.tag} launched\nOfficial support server: https://discord.gg/j8G7jhHMbs`));
+        console.log(chalk.green(`Discord-sempai: version 0.2.3\nBot called ${this.user.tag} launched\nOfficial support server: https://discord.gg/j8G7jhHMbs`));
         }
         if (!this.activity) {
           this.user.setPresence({
@@ -146,7 +145,6 @@ class Bot extends Client {
     
     async loaderComponent(dir) {
       if (!dir) return console.log(new TypeError("Invalid loaderComponent directory"));
-      if (!id) return console.log(new TypeError("Invalid Id component"));
       const Select = new AsciiTable().setHeading('Select', 'Status').setBorder('|', '=', "0", "0");
       const Button = new AsciiTable().setHeading('Button', 'Status').setBorder('|', '=', "0", "0");
       const Modal = new AsciiTable().setHeading('Modal', 'Status').setBorder('|', '=', "0", "0");

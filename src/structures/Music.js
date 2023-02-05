@@ -84,6 +84,16 @@ try {
       const guildQueue = this.getQueue(guildId);
       guildQueue.setPaused(false);
     }
+    
+    joinVC(guildId, channelId) {
+      let queue = this.createQueue(guildId);
+      queue.join(channelId);
+    }
+    
+    leaveVC(guildId) {
+      let queue = this.createQueue(guildId);
+      queue.leave();
+    }
   }
   
   module.exports = Music;
