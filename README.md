@@ -7,7 +7,7 @@
 
 #### Установка
 ```js
-npm i discord-sempai@0.2.2
+npm i discord-sempai@0.2.3
 npm i discord.js@14.7.1
 npm i database-sempai@2.0.4
 npm i ascii-table@0.0.9
@@ -135,8 +135,14 @@ await music.playSong({
       })
 // Добавляет песню в очередь
 
+music.joinVC(guildId, channelId)
+// Присоединиться к голосовому каналу
+
+music.leaveVC(guildId)
+// Покинуть голосовой канал
+
 music.queueSongs(guildId)
-// Очередь. Не работает если что
+// Очередь
 
 music.loopMusic(type, guildId)
 // type - 'OFF' | 'QUEUE' | 'SONG'
@@ -204,15 +210,25 @@ bot.command({
 ```
 
 `{author:text:url?}` - автор вставки
+
 `{authorURL:url}` - устанавливает гиперссылку длч автора
+
 `{title:text}` - заголовок
+
 `{thumbnail:url}` - URL миниатюры изображения для встраивания
+
 `{url:link}` - устанавливает гиперссылку для заголовка
-`{footer:text:url?}`` - нижней колонтитул
-`{description:text}`` - описание
+
+`{footer:text:url?}` - нижней колонтитул
+
+`{description:text}` - описание
+
 `{color:hex}` - устанавливает цвет эмбета
-`{timestamp:ms}`` - вставить отметку времени
+
+`{timestamp:ms}` - вставить отметку времени
+
 `{image:url}` - изображение
+
 Все эти параметры указввайте в `{newEmbed:...}`. Пока что в одном классе можно создать один эмбед.
 
 #### ActionComponent
@@ -311,8 +327,8 @@ bot.slashCommand({
             label: "Tекст",
             placeholder: 'test',
             value: 'test',
-            max: 4000,
-            min: 0,
+            maxValue: 4000,
+            minValue: 0,
             required: true
         })
         modal.addComponents(text)
@@ -432,7 +448,7 @@ Role.getRoleInfo('guildid', 'roleid', 'options')
 ### Djs
 djs классы и не только, которые можно импортировать с `discord-sempai`, а не с `discord.js`
 
-- `Collection`, `WebhookClient`, `GuildMember`, `Guild`, `Message`, `Client`
+- `Client`, `Collection`, `Channel`, `DMChannel`, `GroupDMChannel`, `Guild`, `GuildChannel`, `GuildMember`, `Message`, `MessageReaction`, `PermissionOverwrites`, `Presence`, `Role`, `Snowflake`, `TextChannel`, `User`, `VoiceChannel`, `Webhook`
 - `ApplicationCommandType`, `PermissionsBitField`, `ActivityType`, `ComponentType`, `Events`, `GatewayIntentBits`, `PermissionFlagsBits`, `TextInputStyle`, `ButtonStyle`, `ChannelType`, `Partials`, `RESTJSONErrorCodes`, `AuditLogEvent`, `DataResolver`, `MessageActivityType`, `CommandInteraction`, `MessagePayload`
 
 ### Загрузчик команд
@@ -453,8 +469,8 @@ module.exports = {
           .addSelectMenu({
             customId: "select",
             placeholder: "Ничего не выбрано",
-          // minValues: 1,
-          // maxValues: 1,
+            minValue: 1,
+            maxValue: 1,
             options: {
               label: 'Информация',
               description: 'В этом разделе вы узнаете о себе',

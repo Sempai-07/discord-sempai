@@ -1,6 +1,6 @@
 {
   "name": "discord-sempai",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Simplified package for creating bots in discord",
   "main": "src/index.js",
   "scripts": {
