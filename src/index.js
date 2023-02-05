@@ -20,15 +20,26 @@ exports.isPermissions = require("./function/util/isPermissions.js");
 exports.findMember = require("./function/util/findMember.js");
 exports.findMembers = require("./function/util/findMembers.js");
 exports.findChannel = require("./function/util/findChannel.js");
-exports.joinVoice = require('./voice/joinVoice.js');
-exports.leaveVoice = require('./voice/leaveVoice.js');
 
 // Util classes
+exports.Client = require("./djs/classec.js").Client;
 exports.Collection = require("./djs/classec.js").Collection;
-exports.WebhookClient = require("./djs/classec.js").WebhookClient;
+exports.Channel = require("./djs/classec.js").Channel;
+exports.DMChannel = require("./djs/classec.js").DMChannel;
+exports.GroupDMChannel = require("./djs/classec.js").GroupDMChannel;
+exports.Guild = require("./djs/classec.js").Guild;
+exports.GuildChannel = require("./djs/classec.js").GuildChannel;
 exports.GuildMember = require("./djs/classec.js").GuildMember;
 exports.Message = require("./djs/classec.js").Message;
-exports.Guild = require("./djs/classec.js").Guild;
+exports.MessageReaction = require("./djs/classec.js").MessageReaction;
+exports.PermissionOverwrites = require("./djs/classec.js").PermissionOverwrites;
+exports.Presence = require("./djs/classec.js").Presence;
+exports.Role = require("./djs/classec.js").Role;
+exports.Snowflake = require("./djs/classec.js").Snowflake;
+exports.TextChannel = require("./djs/classec.js").TextChannel;
+exports.User = require("./djs/classec.js").User;
+exports.VoiceChannel = require("./djs/classec.js").VoiceChannel;
+exports.Webhook = require("./djs/classec.js").Webhook;
 exports.Client = require("./djs/classec.js").Client;
 
 // Util djs
