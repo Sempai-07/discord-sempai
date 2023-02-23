@@ -45,7 +45,7 @@ bot.command({
   }
 });
 
-bot.login("DISCORD_BOT_TOKEN");
+bot.connect("DISCORD_BOT_TOKEN");
 ```
 
 ## Документация
