@@ -3,12 +3,15 @@ const AsciiTable = require('ascii-table');
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
+const { promisify } = require('util');
+const readdir = promisify(fs.readdir);
+
 
 
 class Bot extends Client {
   constructor(options = BotOptions) {
     super({intents: 131071});
-    this.token = options.token,
+//    this.token = options.token,
     this.prefix = options.prefix,
 //    this.intents = options.intents || 131071,
     this.status = options.status || undefined,
@@ -95,7 +98,7 @@ class Bot extends Client {
       
       this.on('ready', async() => {
         if (this.ready) {
-        console.log(chalk.green(`Discord-sempai: version 0.2.3\nBot called ${this.user.tag} launched\nOfficial support server: https://discord.gg/j8G7jhHMbs`));
+        console.log(chalk.green(`Discord-sempai: version 0.3.0\nBot called ${this.user.tag} launched\nOfficial support server: https://discord.gg/j8G7jhHMbs`));
         }
         if (!this.activity) {
           this.user.setPresence({
@@ -134,83 +137,94 @@ class Bot extends Client {
     }
     
     createEvent(options) {
+        const client = this;
       if (options.once) {
         this.once(options.name, (...args) => options.code(...args));
       } else if (options === false) {
         this.on(options.name, (...args) => options.code(...args));
-        } else {
-          return console.log(new TypeError('Invalid once options'));
         }
       }
     
     async loaderComponent(dir) {
-      if (!dir) return console.log(new TypeError("Invalid loaderComponent directory"));
-      const Select = new AsciiTable().setHeading('Select', 'Status').setBorder('|', '=', "0", "0");
-      const Button = new AsciiTable().setHeading('Button', 'Status').setBorder('|', '=', "0", "0");
-      const Modal = new AsciiTable().setHeading('Modal', 'Status').setBorder('|', '=', "0", "0");
-      const components = await fs.readdirSync(path.join(process.cwd(),dir)).filter(file => file.endsWith('.js'));
-      components.forEach(async(component) => {
-        const pull = require(path.join(process.cwd(),`${dir}${component}`));
-      if (pull.type === 'select') {
-        this.selects.set(pull.id, pull);
-        await Select.addRow(pull.id, '✔️');
-      } else if (pull.type === 'button') {
-        this.buttons.set(pull.id, pull);
-        await Button.addRow(pull.id, '✔️');
-      } else if (pull.type === 'modal') {
-       this.modals.set(pull.id, pull);
-       await Modal.addRow(pull.id, '✔️');
-      } else {
-        console.log(new TypeError("interactionCreate type invalid"));
-      }
-      });
-      await console.log(chalk.blue(Select.toString()));
-      await console.log(chalk.blue(Button.toString()));
-      await console.log(chalk.blue(Modal.toString()));
+  if (!dir) return console.log(new TypeError("Invalid loaderComponent directory"));
+  const Select = new AsciiTable().setHeading('Select', 'Status').setBorder('|', '=', "0", "0");
+  const Button = new AsciiTable().setHeading('Button', 'Status').setBorder('|', '=', "0", "0");
+  const Modal = new AsciiTable().setHeading('Modal', 'Status').setBorder('|', '=', "0", "0");
+  const components = await fs.readdirSync(dir).filter(file => file.endsWith('.js'));
+  for (const component of components) {
+    const pull = require(path.join(dir, component));
+    if (pull.type === 'select') {
+      this.selects.set(pull.id, pull);
+      await Select.addRow(pull.id, '✔️');
+    } else if (pull.type === 'button') {
+      this.buttons.set(pull.id, pull);
+      await Button.addRow(pull.id, '✔️');
+    } else if (pull.type === 'modal') {
+     this.modals.set(pull.id, pull);
+     await Modal.addRow(pull.id, '✔️');
+    } else {
+      console.log(new TypeError("interactionCreate type invalid"));
     }
+  }
+  console.log(chalk.blue(Select.toString()));
+  console.log(chalk.blue(Button.toString()));
+  console.log(chalk.blue(Modal.toString()));
+}
+
+async loaderSlashCmd(dir) {
+  if (!dir) return console.log(new TypeError("Invalid loaderSlashCmd directory"));
+  const loaderSlashCmd = new AsciiTable().setHeading('Slash cmd', 'Status').setBorder('|', '=', "0", "0");
+  const slashCommands = await fs.readdirSync(dir).filter(file => file.endsWith('.js'));
+  for (const slash of slashCommands) {
+    const pull = require(path.join(dir, slash));
+    this.slashCommands.set(pull.name, pull);
+    await loaderSlashCmd.addRow(pull.name, '✔️');
+  }
+  console.log(chalk.blue(loaderSlashCmd.toString()));
+}
+
+async loaderEvent(dir) {
+  const loaderEvent = new AsciiTable().setHeading('Events', 'Status').setBorder('|', '=', "0", "0");
+  const eventsPath = await dir;
+  const eventFiles = await fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+  for (const file of eventFiles) {
+    const filePath = path.join(eventsPath, file);
+    const event = require(filePath);
+    await loaderEvent.addRow(event.name, '✔️');
+    if (event.once) {
+      this.once(event.name, (...args) => event.code(...args));
+    } else {
+      this.on(event.name, (...args) => event.code(...args));
+    }
+  }
+  console.log(chalk.blue(loaderEvent.toString()));
+}
+
     
     async loaderTextCmd(dir) {
-      if (!dir) return console.log(new TypeError("Invalid loaderTextCmd directory"));
-      const loaderTextCmd = new AsciiTable().setHeading('Text cmd', 'Status').setBorder('|', '=', "0", "0");
-      const commands = await fs.readdirSync(path.join(process.cwd(),dir)).filter(file => file.endsWith('.js'));
-      commands.forEach(async(cmd) => {
-        const pull = require(path.join(process.cwd(),`${dir}${cmd}`));
+  if (!dir) return console.log(new TypeError("Invalid loaderTextCmd directory"));
+
+  const loaderTextCmd = new AsciiTable().setHeading('Text cmd', 'Status').setBorder('|', '=', "0", "0");
+
+  const readDirRecursive = async (directory) => {
+    const files = await fs.readdirSync(directory);
+    for (const file of files) {
+      const filePath = path.join(directory, file);
+      if (fs.statSync(filePath).isDirectory()) {
+        await readDirRecursive(filePath);
+      } else if (file.endsWith('.js')) {
+        const pull = require(filePath);
         this.commands.set(pull.name, pull);
         await loaderTextCmd.addRow(pull.name, '✔️');
         if(pull.aliases && Array.isArray(pull.aliases)) pull.aliases.forEach(alias => this.aliases.set(alias, pull.name));
-      });
-      await console.log(chalk.blue(loaderTextCmd.toString()));
-    }
-    
-    async loaderSlashCmd(dir) {
-      if (!dir) return console.log(new TypeError("Invalid loaderSlashCmd directory"));
-      const loaderSlashCmd = new AsciiTable().setHeading('Slash cmd', 'Status').setBorder('|', '=', "0", "0");
-      const slashCommands = await fs.readdirSync(path.join(process.cwd(), dir)).filter(file => file.endsWith('.js'));
-      slashCommands.forEach(async(slash) => {
-        const pull = require(path.join(process.cwd(),`${dir}${slash}`));
-        this.slashCommands.set(pull.name, pull);
-        await loaderSlashCmd.addRow(pull.name, '✔️');
-      });
-      await console.log(chalk.blue(loaderSlashCmd.toString()));
-    }
-    
-  async loaderEvent(dir) {
-      const loaderEvent = new AsciiTable().setHeading('Events', 'Status').setBorder('|', '=', "0", "0");
-      const eventsPath = await path.join(path.join(process.cwd(), dir));
-      const eventFiles = await fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-      for (const file of eventFiles) {
-        const filePath = path.join(eventsPath, file);
-        const event = require(filePath);
-       await loaderEvent.addRow(event.name, '✔️');
-        if (event.once) {
-          this.once(event.name, (...args) => event.code(...args));
-        } else {
-          this.on(event.name, (...args) => event.code(...args));
-        }
       }
-      await console.log(chalk.blue(loaderEvent.toString()));
     }
-    
+  };
+
+  await readDirRecursive(path.join(process.cwd(), dir));
+  await console.log(chalk.blue(loaderTextCmd.toString()));
+}
+
     Status(options = {name: "online", activity: undefined}) {
       let ClientStatus = options.status;
       let ClientActivity = options.activity;
@@ -218,8 +232,8 @@ class Bot extends Client {
       this.activity = ClientActivity;
     }
     
-    connect() {
-    this.login(this.token);
+    connect(token) {
+    this.login(token);
     if (this.help) {
       this.command({
         name: 'help',

@@ -7,39 +7,33 @@ try {
       return this;
     }
     
-    async playSong(options) {
-        await options.queue.join(options.voiceChannelId)
-        const guildQueue = this.getQueue(options.guildId)
-            const info = await options.queue.play(options.songName, {
-                requestedBy: options.requestedBy
-            }).catch(err => {
-                console.log(err)
-            });
-            const obj = {
-                name: info.name,
-                author: info.author,
-                url: info.url,
-                duration: info.duration,
-                live: info.isLive,
-                first: info.isFirst
-            }
-            return obj
+    async playSong({ queue, voiceChannelId, guildId, songName, requestedBy }) {
+        await queue.join(voiceChannelId);
+        const guildQueue = this.getQueue(guildId);
+        try {
+            const { name, author, url, duration, isLive, isFirst } = await queue.play(songName, { requestedBy });
+            return { name, author, url, duration, live: isLive, first: isFirst };
+        } catch (error) {
+      console.log(error);
+        }
+    }
+    }
+    
+    hasMusicPlaying(guildId) {
+        const guildQueue = this.getQueue(guildId);
+        return guildQueue.isPlaying();
     }
     
     queueSongs(guildId) {
-      const sngs = this.getQueue(guildId).songs;
-      let qu = [];
-      sngs.forEach((sng) => {
-        qu.push({author: sng.author, name: sng.name, duration: sng.duration, requestedBy: sng.requestedBy});
-      });
-      return qu;
+        const songs = this.getQueue(guildId).songs;
+        return songs.map(({ author, name, duration, requestedBy }) => ({ author, name, duration, requestedBy }));
+        
     }
     
     loopMusic(guildId, types) {
       let type = 0;
-      if(types == 'OFF') type = 0;
       if(types == 'SONG') type = 1;
-      if(types == 'QUEUE') type = 2;
+      else if(types == 'QUEUE') type = 2;
       let guildQueue = this.getQueue(guildId);
       return guildQueue.setRepeatMode(type);
     }
@@ -94,14 +88,20 @@ try {
       let queue = this.createQueue(guildId);
       queue.leave();
     }
+    
+    gueueLength(guildId) {
+        const queue = this?.getQueue(guildId);
+        const songCount = queue?.songs.length || 0;
+        return songCount;
+    }
   }
   
   module.exports = Music;
 } catch (e) {
-  class Voice {
+  class MusicError {
     constructor() {
       throw new Error("Install discord-music-player@9.1.1 && @discordjs/opus@0.8.0 to use this feature");
     }
   }
-  module.exports = Voice;
+  module.exports = MusicError;
 }
