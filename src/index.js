@@ -1,0 +1,62 @@
+// Classec
+exports.Bot = require("./structures/Bot.js");
+exports.Database = require("./structures/Database.js");
+exports.MessageEmbed = require("./structures/MessageEmbed.js");
+exports.ActionComponent = require("./structures/ActionComponent.js");
+exports.ModalText = require("./structures/ModalText.js");
+exports.Modal = require("./structures/Modal.js");
+exports.MessageAttachment = require("./structures/MessageAttachment.js");
+exports.Parser = require("./structures/Parser.js");
+exports.Music = require("./structures/Music.js");
+exports.Link = require("./util/Link.js");
+exports.Invite = require("./util/Invite.js");
+exports.Role = require("./util/Role.js");
+exports.Util = require("./util/Util.js");
+
+// Function
+exports.encryption = require("./function/util/encryption.js");
+exports.decoding = require("./function/util/decoding.js");
+exports.isPermissions = require("./function/util/isPermissions.js");
+exports.findMember = require("./function/util/findMember.js");
+exports.findMembers = require("./function/util/findMembers.js");
+exports.findChannel = require("./function/util/findChannel.js");
+
+// Util classes
+exports.Client = require("./djs/classec.js").Client;
+exports.Collection = require("./djs/classec.js").Collection;
+exports.Channel = require("./djs/classec.js").Channel;
+exports.DMChannel = require("./djs/classec.js").DMChannel;
+exports.GroupDMChannel = require("./djs/classec.js").GroupDMChannel;
+exports.Guild = require("./djs/classec.js").Guild;
+exports.GuildChannel = require("./djs/classec.js").GuildChannel;
+exports.GuildMember = require("./djs/classec.js").GuildMember;
+exports.Message = require("./djs/classec.js").Message;
+exports.MessageReaction = require("./djs/classec.js").MessageReaction;
+exports.PermissionOverwrites = require("./djs/classec.js").PermissionOverwrites;
+exports.Presence = require("./djs/classec.js").Presence;
+exports.Role = require("./djs/classec.js").Role;
+exports.Snowflake = require("./djs/classec.js").Snowflake;
+exports.TextChannel = require("./djs/classec.js").TextChannel;
+exports.User = require("./djs/classec.js").User;
+exports.VoiceChannel = require("./djs/classec.js").VoiceChannel;
+exports.Webhook = require("./djs/classec.js").Webhook;
+exports.Client = require("./djs/classec.js").Client;
+
+// Util djs
+exports.ApplicationCommandType = require("./djs/util.js").ApplicationCommandType;
+exports.PermissionsBitField = require("./djs/util.js").PermissionsBitField;
+exports.ActivityType = require("./djs/util.js").ActivityType;
+exports.ComponentType = require("./djs/util.js").ComponentType;
+exports.Events = require("./djs/util.js").Events;
+exports.GatewayIntentBits = require("./djs/util.js").GatewayIntentBits;
+exports.PermissionFlagsBits = require("./djs/util.js").PermissionFlagsBits;
+exports.TextInputStyle = require("./djs/util.js").TextInputStyle;
+exports.ButtonStyle = require("./djs/util.js").ButtonStyle;
+exports.ChannelType = require("./djs/util.js").ChannelType;
+exports.Partials = require("./djs/util.js").Partials;
+exports.RESTJSONErrorCodes = require("./djs/util.js").RESTJSONErrorCodes;
+exports.AuditLogEvent = require("./djs/util.js").AuditLogEvent;
+exports.DataResolver = require("./djs/util.js").DataResolver;
+exports.MessageActivityType = require("./djs/util.js").MessageActivityType;
+exports.CommandInteraction = require("./djs/util.js").CommandInteraction;
+exports.MessagePayload = require("./djs/util.js").MessagePayload;
