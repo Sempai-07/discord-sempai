@@ -1,3 +1,5 @@
+<div align="center"><image src="https://media.discordapp.net/attachments/1063333892838408193/1078336814907146442/Discord_Sempai_1.png"></div>
+
 # Discord sempai
 [![Discord Server](https://img.shields.io/discord/796504104565211187?color=7289da&logo=discord&logoColor=white)](https://discord.gg/EuSbT5HH8b)
 [![NPM Version](https://img.shields.io/npm/v/discord-sempai.svg?maxAge=3600)](https://www.npmjs.com/package/discord-sempai)
@@ -30,10 +32,9 @@ const bot = new Bot({
 });
 // Используйте методы библиотеки, чтобы создать необходимые функциональности для Вашего бота.
 
-Copy code
 bot.createEvent({
-name: 'ready',
-code: (client) => {
+  name: 'ready',
+  code: (client) => {
   console.log(`Вы вошли как  ${client.user.tag}!`);
   }
 });
@@ -50,7 +51,7 @@ bot.connect("DISCORD_BOT_TOKEN");
 
 ## Документация
 
-Подробную документацию по Discord sempai можно найти на официальном сайте.
+Подробную документацию по Discord sempai можно найти на <a href="https://Sempai-07.github.io/dosc-discord-sempai">официальном сайте</a>
 
 ## Вклад
 
