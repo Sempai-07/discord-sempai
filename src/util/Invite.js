@@ -26,6 +26,17 @@ class Invites {
     const invite = await client.fetchInvite(code);
     await invite.delete();
   }
+  
+  static async hasInvite(guild, code) {
+  try {
+    const invites = await guild.invites.fetch();
+    const invite = invites.find((i) => i.code === code);
+    return !!invite;
+  } catch (error) {
+    console.error(`Error fetching invites: ${error}`);
+    return false;
+  }
+  }
 }
 
 module.exports = Invites;
