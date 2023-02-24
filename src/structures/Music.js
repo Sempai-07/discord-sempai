@@ -1,5 +1,5 @@
 try {
-  const { DefaultPlayerOptions, Player, ProgressBar } = require("discord-music-player");
+  const { DefaultPlayerOptions, Player, ProgressBar, AudioPlayer } = require("discord-music-player");
 
   class Music extends Player {
     constructor(botOptions, options) {
@@ -85,7 +85,7 @@ try {
     }
     
     leaveVC(guildId) {
-      let queue = this.createQueue(guildId);
+      let queue = this.getQueue(guildId);
       queue.leave();
     }
     
@@ -94,6 +94,38 @@ try {
         const songCount = queue?.songs.length || 0;
         return songCount;
     }
+    
+    getCurrentVolume(guildId) {
+        const queue = this?.getQueue(guildId);
+        const volume = queue.getVolume();
+        return volume;
+    }
+    
+    getLoopType(guildId) {
+        const queue = this?.getQueue(guildId);
+        if (queue.queueRepeat) {
+            return 'queue';
+        } else if (queue.trackRepeat) {
+            return 'track';
+        } else {
+            return 'none';
+        }
+    }
+    
+    isQueueLooping(guildId, type = 'all') {
+        let loop;
+        const queue = this?.getQueue(guildId);
+        if (type === 'all') loop = queue.queueRepeat || queue.trackRepeat
+        else if (type === 'track') loop = queue.trackRepeat
+        else if (type === 'queue') loop = queue.queueRepeat
+        return loop;
+    }
+    
+    isTrackLooping(guildId) {
+        const queue = this?.getQueue(guildId);
+        return queue.trackRepeat;
+    }
+
   }
   
   module.exports = Music;
