@@ -1,4 +1,5 @@
 const { Client, Collection, ActivityType, PermissionsBitField, ApplicationCommandType, EmbedBuilder} = require('discord.js');
+const { Database } = require('discord-sempai');
 const AsciiTable = require('ascii-table');
 const fs = require('fs');
 const path = require('path');
@@ -24,7 +25,8 @@ class Bot extends Client {
     this.selects = new Collection(),
     this.buttons = new Collection(),
     this.modals = new Collection()
- 
+    
+    
     this.on('messageCreate', async (message) => {
       this.prefix = typeof this.prefix === "string" ? [this.prefix] : this.prefix;
       let prefixes = [];
@@ -45,7 +47,7 @@ class Bot extends Client {
       let command = client.commands.get(cmd);
       if(!command) command = client.commands.get(client.aliases.get(cmd));
       if(!command) return;
-      command.code(client, message, args);
+      await command.code(client, message, args);
     });
     
     this.on('interactionCreate', async (interaction) => {
