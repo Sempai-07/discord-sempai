@@ -3,23 +3,39 @@ exports.Bot = require("./structures/Bot.js");
 exports.Database = require("./structures/Database.js");
 exports.MessageEmbed = require("./structures/MessageEmbed.js");
 exports.ActionComponent = require("./structures/ActionComponent.js");
-exports.ModalText = require("./structures/ModalText.js");
-exports.Modal = require("./structures/Modal.js");
 exports.MessageAttachment = require("./structures/MessageAttachment.js");
 exports.Parser = require("./structures/Parser.js");
 exports.Music = require("./structures/Music.js");
-exports.Link = require("./util/Link.js");
-exports.Invite = require("./util/Invite.js");
-exports.Role = require("./util/Role.js");
-exports.Util = require("./util/Util.js");
+exports.Cache = require("./structures/Cache.js");
 
-// Function
-exports.encryption = require("./function/util/encryption.js");
-exports.decoding = require("./function/util/decoding.js");
-exports.isPermissions = require("./function/util/isPermissions.js");
-exports.findMember = require("./function/util/findMember.js");
-exports.findMembers = require("./function/util/findMembers.js");
-exports.findChannel = require("./function/util/findChannel.js");
+// Util classic
+// Guild
+exports.GuildEmoji = require("./structures/Guild/GuildEmoji.js")
+exports.GuildManager = require("./structures/Guild/GuildManager.js")
+exports.MessageReaction = require("./structures/Guild/MessageReaction.js")
+exports.GuildRole = require("./structures/Guild/GuildRole.js")
+exports.GuildWebhook = require("./structures/Guild/GuildWebhook.js")
+exports.GuildInvite = require("./structures/Guild/GuildInvite.js")
+exports.PermissionChecker = require("./structures/Guild/PermissionChecker.js")
+exports.GuildVoice = require("./structures/Guild/GuildVoice.js")
+exports.MessageCollection = require("./structures/Guild/MessageCollection.js")
+exports.MessageReplyOption = require("./structures/Guild/MessageReplyOption.js");
+
+// Util
+exports.Paginator = require("./structures/Util/Paginator.js")
+exports.Randomizer = require("./structures/Util/Randomizer.js")
+exports.TextFormatter = require("./structures/Util/TextFormatter.js")
+exports.Verification = require("./structures/Util/Verification.js")
+exports.FileManager = require("./structures/Util/FileManager.js")
+exports.ErrorHandler = require("./structures/Util/ErrorHandler.js")
+exports.AsyncHandler = require("./structures/Util/AsyncHandler.js")
+exports.PromiseUtils = require("./structures/Util/PromiseUtils.js")
+
+// Interaction 
+exports.SlashCommandManager = require("./structures/Interaction/SlashCommandManager.js");
+exports.SlashCommandOption = require("./structures/Interaction/SlashCommandOption.js");
+exports.InteractionReplyOption = require("./structures/Interaction/InteractionReplyOption.js");
+exports.ContextMenuManager = require("./structures/Interaction/ContextMenuManager.js");
 
 // Util classes
 exports.Client = require("./djs/classec.js").Client;
