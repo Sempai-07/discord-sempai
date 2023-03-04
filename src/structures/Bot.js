@@ -1,5 +1,4 @@
 const { Client, Collection, ActivityType, PermissionsBitField, ApplicationCommandType, EmbedBuilder} = require('discord.js');
-const { Database } = require('discord-sempai');
 const AsciiTable = require('ascii-table');
 const fs = require('fs');
 const path = require('path');
@@ -12,9 +11,7 @@ const readdir = promisify(fs.readdir);
 class Bot extends Client {
   constructor(options = BotOptions) {
     super({intents: 131071});
-//    this.token = options.token,
     this.prefix = options.prefix,
-//    this.intents = options.intents || 131071,
     this.status = options.status || undefined,
     this.activity,
     this.help = options.help || true,
@@ -24,7 +21,8 @@ class Bot extends Client {
     this.slashCommands = new Collection(),
     this.selects = new Collection(),
     this.buttons = new Collection(),
-    this.modals = new Collection()
+    this.modals = new Collection(),
+    this.contextMenu = new Collection()
     
     
     this.on('messageCreate', async (message) => {
@@ -47,7 +45,11 @@ class Bot extends Client {
       let command = client.commands.get(cmd);
       if(!command) command = client.commands.get(client.aliases.get(cmd));
       if(!command) return;
-      await command.code(client, message, args);
+      try {
+        await command.code(client, message, args);
+       } catch(error) {
+        console.log(error)
+       }
     });
     
     this.on('interactionCreate', async (interaction) => {
@@ -74,29 +76,82 @@ class Bot extends Client {
       }
     });
     
-    this.on("interactionCreate", async(interaction) => {
-        if (!interaction.isCommand()) return;
-        const command = this.slashCommands.get(interaction.commandName);
+    this.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return;
+  const client = this;
+  const { commandName, options } = interaction;
+  const command = client.slashCommands.get(commandName);
+
+  if (!command) return;
+
+  try {
+    const args = {};
+    command.options.forEach((option) => {
+      console.log(option);
+      let value = options.get(option.name);
+
+      if (value === undefined) {
+        if (option.required) {
+          throw new Error(`Missing required option: ${option.name}`);
+        } else {
+          args[option.name] = option.default ?? null;
+        }
+      } else {
+        switch (option.type) {
+          case 1:
+          case 2:
+            args[option.name] = value.name;
+            options.forEach((subOption) => {
+              args[subOption.name] = subOption.value;
+            });
+            break;
+          case 3:
+          case 7:
+          case 6:
+          case 8:
+            args[option.name] = value.toString();
+            break;
+          case 4:
+          case 10:
+            if (typeof value === 'number') {
+              args[option.name] = value;
+            } else {
+              const numberValue = parseInt(value.value);
+              if (isNaN(numberValue)) {
+                throw new Error(`Option ${option.name} must be a number`);
+              }
+              args[option.name] = numberValue;
+            }
+            break;
+          case 5:
+            args[option.name] = value === 'true';
+            break;
+          default:
+            throw new Error(`Unsupported option type: ${option.type}`);
+        }
+      }
+    });
+
+    await command.code(client, interaction, args);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+            
+      this.on("interactionCreate", async(interaction) => {
+        if (!interaction.isContextMenuCommand()) return;
+        const command = this.contextMenu.get(interaction.commandName);
         if (!command) return;
         let client = this;
         try {
           await command.code(client, interaction);
-        } catch (err) {
-          console.log(err);
+        } catch (error) {
+          console.log(error);
         }
-      });
-      
-      this.on('interactionCreate', async(interaction) => {
-        if (!interaction.isModalSubmit()) return;
-        const modal = this.modals.get(interaction.customId);
-        if (!modal) return;
-        let client = this;
-        try {
-          await modal.code(client, interaction);
-        } catch (err) {
-          console.log(err);
-        }
-      });
+      })
+    
       
       this.on('ready', async() => {
         if (this.ready) {
@@ -121,14 +176,19 @@ class Bot extends Client {
     }
     
   interactionCreate(options) {
-      if (options.type === 'select') {
+      if (options.prototype === 'select') {
       this.selects.set(options.id, options);
-      } else if (options.type === 'button') {
+      } else if (options.prototype === 'button') {
       this.buttons.set(options.id, options);
-      } else if (options.type === 'modal') {
+      } else if (options.prototype === 'modal') {
        this.modals.set(options.id, options);
+      } else if (options.prototype === 'contextmenu') {
+       this.contextMenu.set(options.name, options)
+       setTimeout(async() => {
+          await this.application.commands.create(options);
+      }, 4000)
       } else {
-        console.log(new TypeError("interactionCreate type invalid " + options.type));
+        console.log(new TypeError("interactionCreate prototype invalid " + options.type));
       }
     }
     
@@ -136,41 +196,55 @@ class Bot extends Client {
       if (!options.name) return console.log(new TypeError("Invalid slashCommands name"));
       if (!options.description) return console.log(new TypeError("Invalid slashCommands description"));
       this.slashCommands.set(options.name, options);
+      setTimeout(async() => {
+          await this.application.commands.create(options);
+      }, 4000)
     }
     
     createEvent(options) {
         const client = this;
-      if (options.once) {
-        this.once(options.name, (...args) => options.code(...args));
-      } else if (options === false) {
-        this.on(options.name, (...args) => options.code(...args));
-        }
-      }
+        const { name, once, code } = options;
+
+  if (once) {
+    client.once(name, (...args) => code(client, ...args));
+  } else {
+    client.on(name, (...args) => code(client, ...args));
+  }
+}
+
     
     async loaderComponent(dir) {
   if (!dir) return console.log(new TypeError("Invalid loaderComponent directory"));
   const Select = new AsciiTable().setHeading('Select', 'Status').setBorder('|', '=', "0", "0");
   const Button = new AsciiTable().setHeading('Button', 'Status').setBorder('|', '=', "0", "0");
   const Modal = new AsciiTable().setHeading('Modal', 'Status').setBorder('|', '=', "0", "0");
+  const ContextMenu = new AsciiTable().setHeading('ContextMenu', 'Status').setBorder('|', '=', "0", "0");
   const components = await fs.readdirSync(dir).filter(file => file.endsWith('.js'));
   for (const component of components) {
     const pull = require(path.join(dir, component));
-    if (pull.type === 'select') {
+    if (pull.prototype === 'select') {
       this.selects.set(pull.id, pull);
       await Select.addRow(pull.id, '✔️');
-    } else if (pull.type === 'button') {
+    } else if (pull.prototype === 'button') {
       this.buttons.set(pull.id, pull);
       await Button.addRow(pull.id, '✔️');
-    } else if (pull.type === 'modal') {
+    } else if (pull.prototype === 'modal') {
      this.modals.set(pull.id, pull);
      await Modal.addRow(pull.id, '✔️');
+    } else if (pull.prototype === 'contextmenu') {
+     this.contextMenu.set(pull.name, pull)
+     setTimeout(async() => {
+          await this.application.commands.create(pull);
+      }, 4000)
+     await ContextMenu.addRow(pull.name, '✔️')
     } else {
-      console.log(new TypeError("interactionCreate type invalid"));
+      console.log(new TypeError("interactionCreate prototype invalid"));
     }
   }
   console.log(chalk.blue(Select.toString()));
   console.log(chalk.blue(Button.toString()));
   console.log(chalk.blue(Modal.toString()));
+console.log(chalk.blue(ContextMenu.toString()));
 }
 
 async loaderSlashCmd(dir) {
@@ -179,27 +253,42 @@ async loaderSlashCmd(dir) {
   const slashCommands = await fs.readdirSync(dir).filter(file => file.endsWith('.js'));
   for (const slash of slashCommands) {
     const pull = require(path.join(dir, slash));
-    this.slashCommands.set(pull.name, pull);
+    setTimeout(async() => {
+          await this.application.commands.create(pull);
+      }, 4000)
+    await this.slashCommands.set(pull.name, pull)
     await loaderSlashCmd.addRow(pull.name, '✔️');
   }
   console.log(chalk.blue(loaderSlashCmd.toString()));
 }
 
-async loaderEvent(dir) {
+    async loaderEvent(dir) {
+  if (!dir) return console.log(new TypeError("Invalid loaderEvent directory"));
+
   const loaderEvent = new AsciiTable().setHeading('Events', 'Status').setBorder('|', '=', "0", "0");
-  const eventsPath = await dir;
-  const eventFiles = await fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-  for (const file of eventFiles) {
-    const filePath = path.join(eventsPath, file);
-    const event = require(filePath);
-    await loaderEvent.addRow(event.name, '✔️');
-    if (event.once) {
-      this.once(event.name, (...args) => event.code(...args));
-    } else {
-      this.on(event.name, (...args) => event.code(...args));
+
+  const readDirRecursive = async (directory) => {
+    const files = await fs.readdirSync(directory);
+    for (const file of files) {
+      const filePath = path.join(directory, file);
+      console.log(path.join(directory, file));
+      if (fs.statSync(filePath).isDirectory()) {
+        await readDirRecursive(filePath);
+      } else if (file.endsWith('.js')) {
+        const event = require(filePath);
+        await loaderEvent.addRow(event.name, '✔️');
+        const client = this;
+        if (event.once) {
+    client.once(event.name, (...args) => code(client, ...args));
+  } else {
+    client.on(event.name, (...args) => code(client, ...args));
+      }
     }
-  }
-  console.log(chalk.blue(loaderEvent.toString()));
+  };
+
+  await readDirRecursive(path.join(process.cwd(), dir));
+  await console.log(chalk.blue(loaderEvent.toString()));
+ }
 }
 
     
@@ -221,7 +310,7 @@ async loaderEvent(dir) {
         if(pull.aliases && Array.isArray(pull.aliases)) pull.aliases.forEach(alias => this.aliases.set(alias, pull.name));
       }
     }
-  };
+  }
 
   await readDirRecursive(path.join(process.cwd(), dir));
   await console.log(chalk.blue(loaderTextCmd.toString()));
@@ -249,12 +338,6 @@ async loaderEvent(dir) {
         }
       });
     }
-    setTimeout(async() => {
-      if(this.slashCommands.size != 0) {
-        await this.application.commands.set(this.slashCommands);
-        console.log(chalk.yellow("Slashes registered"));
-      }
-    }, 8000);
   }
 }
 

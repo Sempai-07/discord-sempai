@@ -73,7 +73,7 @@ progressBar(guildId, arrow, block, size) {
     }
 }
 
-skipTrack(guildId, numberSkip) {
+skipTrack(guildId, numberSkip = 1) {
     try {
         const guildQueue = this?.getQueue(guildId)
         guildQueue?.skip(numberSkip)
