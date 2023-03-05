@@ -85,9 +85,9 @@ class Bot extends Client {
   if (!command) return;
 
   try {
+    if (command.options?.forEach((a) => 'pon') !== undefined) {
     const args = {};
     command.options.forEach((option) => {
-      console.log(option);
       let value = options.get(option.name);
 
       if (value === undefined) {
@@ -131,8 +131,10 @@ class Bot extends Client {
         }
       }
     });
-
     await command.code(client, interaction, args);
+    } else {
+      await command.code(client, interaction);
+    }
   } catch (error) {
     console.error(error);
   }
@@ -155,7 +157,7 @@ class Bot extends Client {
       
       this.on('ready', async() => {
         if (this.ready) {
-        console.log(chalk.green(`Discord-sempai: version 0.3.0\nBot called ${this.user.tag} launched\nOfficial support server: https://discord.gg/j8G7jhHMbs`));
+        console.log(chalk.green(`Discord-sempai: version 0.3.3\nBot called ${this.user.tag} launched\nOfficial support server: https://discord.gg/j8G7jhHMbs`));
         }
         if (!this.activity) {
           this.user.setPresence({
